@@ -4,7 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "socket_helpers.hpp"
-
+#include <functional>
 #include <cppcoro/net/ip_endpoint.hpp>
 
 #if CPPCORO_OS_WINNT

@@ -32,10 +32,11 @@ pub fn build(b: *std.Build) void {
     libcppcoro.addCSourceFiles(src, cxxFlags);
 
     if (target.isWindows()) {
-        libcppcoro.defineCMacro("SCOPEID_UNSPECIFIED_INIT", "0");
+        libcppcoro.defineCMacro("SCOPEID_UNSPECIFIED_INIT", "{0}");
         libcppcoro.addCSourceFiles(win_src, cxxFlags);
         libcppcoro.linkSystemLibrary("ws2_32");
         libcppcoro.linkSystemLibrary("mswsock");
+        libcppcoro.linkSystemLibrary("kernel32");
         libcppcoro.want_lto = false;
     }
     // TODO: MSVC no has libcxx support (need: ucrt/vcruntime)
@@ -45,15 +46,8 @@ pub fn build(b: *std.Build) void {
     } else {
         libcppcoro.linkLibCpp(); // LLVM libc++ (builtin)
     }
-    libcppcoro.installHeadersDirectoryOptions(.{
-        .source_dir = "include",
-        .install_dir = .header,
-        .install_subdir = "",
-        .exclude_extensions = &.{
-            "am",
-            "gitignore",
-        },
-    });
+    libcppcoro.installHeadersDirectory("include", "");
+
     b.installArtifact(libcppcoro);
 
     if (tests) {
@@ -217,9 +211,10 @@ fn buildTest(b: *std.Build, info: BuildInfo) void {
 }
 
 const cxxFlags: []const []const u8 = &.{
-    "-std=c++2b",
+    "-std=c++20",
     "-Wall",
     "-Wextra",
+    "-fexperimental-library",
 };
 
 const src = &.{
