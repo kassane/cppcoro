@@ -32,7 +32,8 @@ pub fn build(b: *std.Build) void {
     libcppcoro.addCSourceFiles(src, cxxFlags);
 
     if (target.isWindows()) {
-        libcppcoro.defineCMacro("SCOPEID_UNSPECIFIED_INIT", "{0}");
+        if (target.cpu_arch != .aarch64)
+            libcppcoro.defineCMacro("_WIN32_WINNT", "0x0601");
         libcppcoro.addCSourceFiles(win_src, cxxFlags);
         libcppcoro.linkSystemLibrary("ws2_32");
         libcppcoro.linkSystemLibrary("mswsock");
